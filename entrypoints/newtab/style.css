@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  width: 100vw;
+  height: 100vh;
+}
+
+@keyframes bookmark-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(28px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes bookmark-slide-previous {
+  from {
+    opacity: 0;
+    transform: translateX(-28px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
