@@ -5,7 +5,7 @@ import { useNewtabStore } from "./store";
 import Calendar from "./components/Calendar";
 import Clock from "./components/Clock";
 import Weather from "./components/Weather";
-import { Leaf } from "lucide-react";
+import LeafIcon from "../../assets/Animal_Crossing_Leaf.svg?react";
 import { SearchBar } from "./components/SearchBar";
 import { Bookmarks } from "./components/BookMark";
 import SettingsSidebar from "./components/SettingsSidebar";
@@ -19,7 +19,7 @@ function App() {
       style={{ backgroundColor: config.backgroundColor }}
     >
       <div className="absolute top-8 left-8 text-[#59C19D] opacity-80 flex items-center gap-2 font-black text-xl">
-        <Leaf size={32} className="fill-[#59C19D]" />
+        <LeafIcon width={32} height={32} className="fill-[#59C19D]" />
         <span>NookInc.</span>
       </div>
       <main className="flex w-full max-w-5xl flex-col items-center gap-5">
