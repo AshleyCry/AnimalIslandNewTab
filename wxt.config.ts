@@ -8,8 +8,8 @@ export default defineConfig({
     plugins: [tailwindcss(), svgr()],
   }),
   manifest: {
-    name: "Animal New Tab",
-    description: "A cozy Animal Crossing-inspired new tab page.",
+    name: "Animal Island New Tab",
+    description: "A cozy Animal Island-inspired new tab page.",
     version: "1.0.0",
     manifest_version: 3,
     permissions: ["geolocation"],
