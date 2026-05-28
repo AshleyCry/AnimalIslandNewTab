@@ -109,7 +109,7 @@ function normalizeWeather(
     lowTemperature: Math.round(response.daily?.temperature_2m_min?.[0] ?? 0),
     highTemperature: Math.round(response.daily?.temperature_2m_max?.[0] ?? 0),
     humidity: Math.round(response.current?.relative_humidity_2m ?? 0),
-    location: locationName || "当前位置",
+    location: locationName || "",
   };
 }
 

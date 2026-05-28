@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Select } from "animal-island-ui";
 import { Search } from "lucide-react";
 import { useNewtabStore, type SearchEngine } from "../../store";
+import "./style.css";
 
 const ENGINES = [
   {
@@ -60,9 +61,9 @@ export function SearchBar() {
     <div className="w-full max-w-2xl relative mt-4">
       <form
         onSubmit={handleSearch}
-        className="flex items-center bg-white border-4 border-[#E5D9B4] rounded-3xl p-2 shadow-[0_6px_0_#D9CBB0] focus-within:border-[#59C19D] focus-within:shadow-[0_6px_0_#43A081] transition-all"
+        className="flex items-center bg-white border-4 border-[#c4b89e] rounded-3xl p-2 shadow-[0_6px_0_#d4c9b4] focus-within:border-[#59C19D] focus-within:shadow-[0_6px_0_#8dccb6] transition-all"
       >
-        <div className="search-engine-select min-w-[150px]">
+        <div className="search-engine-select">
           <Select
             options={engineOptions}
             value={engineId}

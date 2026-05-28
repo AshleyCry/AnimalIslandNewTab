@@ -40,7 +40,9 @@ export type NewtabConfig = {
 
 type NewtabStore = {
   config: NewtabConfig;
+  bigLoading: boolean;
   updateConfig: (config: Partial<NewtabConfig>) => void;
+  setBigLoading: (bigLoading: boolean) => void;
 };
 
 const CONFIG_STORAGE_KEY = "animal-cross-newtab-config";
@@ -182,6 +184,7 @@ function saveConfigToLocalStorage(config: NewtabConfig) {
 
 export const useNewtabStore = create<NewtabStore>((set) => ({
   config: loadConfigFromLocalStorage(),
+  bigLoading: false, // 控制全局loading画面
   updateConfig: (config) =>
     set((state) => {
       const nextConfig = mergeConfig({
@@ -195,4 +198,5 @@ export const useNewtabStore = create<NewtabStore>((set) => ({
         config: nextConfig,
       };
     }),
+  setBigLoading: (bigLoading) => set({ bigLoading }),
 }));

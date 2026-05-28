@@ -1,0 +1,10 @@
+.search-engine-select {
+  width: 130px;
+  min-width: 112px;
+  flex-shrink: 0;
+}
+
+.search-engine-select > [class^="animal-wrapper-"] {
+  width: 100%;
+  min-width: 0;
+}

@@ -139,10 +139,9 @@ export function Bookmarks() {
               href={bookmarkItem.url}
               className="group flex flex-col items-center gap-2"
               rel="noreferrer"
-              target="_blank"
             >
               <div
-                className="w-16 h-16 sm:w-20 sm:h-20 mb-1 rounded-[28px] flex items-center justify-center transition-all transform group-hover:-translate-y-2 group-hover:scale-105 border-4 border-white shadow-[0_6px_0_#D9CBB0]"
+                className="w-16 h-16 sm:w-20 sm:h-20 mb-1 rounded-[28px] flex items-center justify-center transition-all transform group-hover:-translate-y-2 group-hover:scale-105 border-4 border-white shadow-[0_6px_0_#bdaea0]"
                 style={{
                   backgroundColor:
                     bookmarkItem.backgroundColor ?? DEFAULT_BOOKMARK_BACKGROUND,

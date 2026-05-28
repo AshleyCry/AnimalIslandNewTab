@@ -96,7 +96,10 @@ function BookmarkSettingsPanel({ onBack }: { onBack: () => void }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const sortableIds = useMemo(
-    () => bookmarkItems.map((bookmarkItem, index) => getBookmarkId(bookmarkItem, index)),
+    () =>
+      bookmarkItems.map((bookmarkItem, index) =>
+        getBookmarkId(bookmarkItem, index),
+      ),
     [bookmarkItems],
   );
   const isEditorOpen = editingIndex !== null;
@@ -132,7 +135,9 @@ function BookmarkSettingsPanel({ onBack }: { onBack: () => void }) {
 
   const handleDelete = (index: number) => {
     updateConfig({
-      bookmarkItems: bookmarkItems.filter((_, itemIndex) => itemIndex !== index),
+      bookmarkItems: bookmarkItems.filter(
+        (_, itemIndex) => itemIndex !== index,
+      ),
     });
   };
 
@@ -178,7 +183,7 @@ function BookmarkSettingsPanel({ onBack }: { onBack: () => void }) {
             items={sortableIds}
             strategy={verticalListSortingStrategy}
           >
-            <div className="max-h-[calc(100vh-260px)] space-y-3 overflow-y-auto pr-1">
+            <div className="max-h-[calc(100vh-260px)] space-y-3 overflow-y-auto pr-1 pb-1">
               {bookmarkItems.map((bookmarkItem, index) => (
                 <SortableBookmarkItem
                   key={sortableIds[index]}

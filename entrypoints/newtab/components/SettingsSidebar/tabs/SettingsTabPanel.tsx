@@ -56,7 +56,7 @@ function SettingsTabPanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-7">
       <label className="flex items-center justify-between gap-4">
         <span className="text-sm font-black text-[#725d42]">背景颜色</span>
         <div className="flex min-w-36 items-center gap-2">
@@ -95,24 +95,22 @@ function SettingsTabPanel() {
 
       <label className="flex items-center justify-between gap-4">
         <span className="text-sm font-black text-[#725d42]">时间制</span>
-        <div className="min-w-36">
-          <Select
-            options={clockFormatOptions}
-            value={config.clockFormat}
-            onChange={handleClockFormatChange}
-          />
-        </div>
+
+        <Select
+          options={clockFormatOptions}
+          value={config.clockFormat}
+          onChange={handleClockFormatChange}
+        />
       </label>
 
       <label className="flex items-center justify-between gap-4">
         <span className="text-sm font-black text-[#725d42]">天气定位模式</span>
-        <div className="min-w-36">
-          <Select
-            options={weatherLocationModeOptions}
-            value={config.weatherLocationMode}
-            onChange={handleWeatherLocationModeChange}
-          />
-        </div>
+
+        <Select
+          options={weatherLocationModeOptions}
+          value={config.weatherLocationMode}
+          onChange={handleWeatherLocationModeChange}
+        />
       </label>
 
       <div className="flex items-center justify-between gap-4">

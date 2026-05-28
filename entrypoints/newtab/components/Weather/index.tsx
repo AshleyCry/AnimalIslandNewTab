@@ -41,6 +41,35 @@ function getWeatherIcon(weatherType?: string) {
   }
 }
 
+function getWeatherIconColor(weatherType?: string) {
+  switch (weatherType) {
+    case "Clear":
+      return "text-[#ffc53d]";
+    case "Clouds":
+      return "text-[#8d99a6]";
+    case "Drizzle":
+      return "text-[#5ab5d8]";
+    case "Rain":
+      return "text-[#3f8edc]";
+    case "Thunderstorm":
+      return "text-[#7467d8]";
+    case "Snow":
+      return "text-[#78c8e8]";
+    case "Mist":
+    case "Smoke":
+    case "Haze":
+    case "Dust":
+    case "Fog":
+    case "Sand":
+    case "Ash":
+    case "Squall":
+    case "Tornado":
+      return "text-[#9aa0a6]";
+    default:
+      return "text-[#8d99a6]";
+  }
+}
+
 function getHumidityDescription(value: number) {
   if (value < 40) {
     return "偏干";
@@ -66,9 +95,10 @@ function Weather() {
         ? "定位中"
         : "未知"
       : getHumidityDescription(humidity);
-  const location = error ?? data?.location ?? "当前";
+  const location = error ?? data?.location ?? "";
   const title = `${location}天气`;
   const WeatherIcon = getWeatherIcon(data?.weatherType);
+  const weatherIconColor = getWeatherIconColor(data?.weatherType);
 
   return (
     <CardWithTitle
@@ -77,7 +107,10 @@ function Weather() {
     >
       <div className="grid grid-cols-[64px_1fr] items-center gap-3">
         <div className="flex justify-center">
-          <WeatherIcon className="h-16 w-16 text-[#ffc53d]" strokeWidth={2.4} />
+          <WeatherIcon
+            className={`h-16 w-16 ${weatherIconColor}`}
+            strokeWidth={2.4}
+          />
         </div>
 
         <div className="flex flex-col items-center gap-1 text-center">

@@ -8,7 +8,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function ConfigSyncTabPanel() {
-  const config = useNewtabStore((state) => state.config);
+  const { config, setBigLoading } = useNewtabStore();
   const updateConfig = useNewtabStore((state) => state.updateConfig);
   const [syncMessage, setSyncMessage] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,6 +53,10 @@ function ConfigSyncTabPanel() {
 
       updateConfig(parsedConfig as Partial<NewtabConfig>);
       setSyncMessage("配置已导入");
+      setBigLoading(true);
+      setTimeout(() => {
+        setBigLoading(false);
+      }, 3000);
     } catch {
       setSyncMessage("导入失败：JSON 文件解析失败");
     }
@@ -67,7 +71,7 @@ function ConfigSyncTabPanel() {
         className="hidden"
         onChange={handleConfigFileChange}
       />
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         <Button
           block
           type="primary"
