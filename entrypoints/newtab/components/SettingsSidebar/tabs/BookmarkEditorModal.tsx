@@ -82,7 +82,7 @@ function BookmarkEditorModal({
       onClose={onClose}
       typewriter={false}
     >
-      <div className="space-y-4">
+      <div className="space-y-4 w-full">
         <label className="block space-y-2">
           <span className="text-sm font-black text-[#725d42]">标题</span>
           <Input

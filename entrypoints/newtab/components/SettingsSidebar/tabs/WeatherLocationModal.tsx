@@ -91,11 +91,12 @@ function WeatherLocationModal({ open, onClose }: WeatherLocationModalProps) {
       onClose={onClose}
       typewriter={false}
     >
-      <div className="space-y-4">
-        <div className="flex gap-2">
+      <div className="text-sm">搜索英文会更准</div>
+      <div className="space-y-4 w-full">
+        <div className="flex gap-2 items-center">
           <Input
             value={locationKeyword}
-            placeholder="输入城市或地区，例如上海"
+            placeholder="输入城市或地区，有时英文更准"
             allowClear
             onChange={(event) => setLocationKeyword(event.target.value)}
             onClear={() => {
