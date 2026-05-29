@@ -13,7 +13,7 @@ import { Bookmarks } from "./components/BookMark";
 import SettingsSidebar from "./components/SettingsSidebar";
 import { Settings } from "lucide-react";
 
-const GITHUB_REPOSITORY_URL = "https://github.com/AshleyCry/AnimalCrossNewTab";
+const GITHUB_REPOSITORY_URL = "https://github.com/AshleyCry/AnimalIslandNewTab";
 
 function App() {
   const config = useNewtabStore((state) => state.config);
