@@ -60,7 +60,7 @@ function App() {
           <SearchBar />
           <Bookmarks />
         </main>
-        <div className="fixed w-screen bottom-8 px-8 z-40 flex justify-between">
+        <div className="absolute w-screen bottom-8 px-8 z-40 flex justify-between">
           <div className="flex gap-4">
             <Button
               type="primary"

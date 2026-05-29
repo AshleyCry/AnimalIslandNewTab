@@ -11,6 +11,9 @@ type SettingsSidebarProps = {
   onClose: () => void;
 };
 
+const TAB_PANEL_CLASS_NAME =
+  "max-h-[calc(100vh-330px)] overflow-y-auto bg-[#f4efe3] p-4 text-sm font-bold text-[#8a7966]";
+
 function isSettingsTab(value: string): value is SettingsTab {
   return value === "settings" || value === "sync";
 }
@@ -31,7 +34,7 @@ function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
       key: "settings",
       label: "设置",
       children: (
-        <div className="rounded-2xl bg-[#f4efe3] text-sm font-bold text-[#8a7966]">
+        <div className={TAB_PANEL_CLASS_NAME}>
           <SettingsTabPanel />
         </div>
       ),
@@ -40,7 +43,7 @@ function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
       key: "sync",
       label: "配置同步",
       children: (
-        <div className="rounded-2xl bg-[#f4efe3] text-sm font-bold text-[#8a7966]">
+        <div className={TAB_PANEL_CLASS_NAME}>
           <ConfigSyncTabPanel />
         </div>
       ),
@@ -63,7 +66,7 @@ function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
           open ? "translate-x-0" : "translate-x-full",
         ].join(" ")}
       >
-        <div className="p-6 max-h-[calc(100%-80px)] flex flex-col gap-6">
+        <div className="flex max-h-[calc(100%-80px)] min-h-0 flex-col gap-6 p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-black">设置</h2>
             <Button

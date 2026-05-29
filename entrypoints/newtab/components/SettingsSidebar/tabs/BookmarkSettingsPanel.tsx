@@ -183,7 +183,7 @@ function BookmarkSettingsPanel({ onBack }: { onBack: () => void }) {
             items={sortableIds}
             strategy={verticalListSortingStrategy}
           >
-            <div className="max-h-[calc(100vh-260px)] space-y-3 overflow-y-auto pr-1 pb-1">
+            <div className="space-y-3 pb-1">
               {bookmarkItems.map((bookmarkItem, index) => (
                 <SortableBookmarkItem
                   key={sortableIds[index]}
