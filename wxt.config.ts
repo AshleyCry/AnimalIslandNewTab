@@ -4,8 +4,9 @@ import svgr from "vite-plugin-svgr";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
-  vite: () => ({
+  vite: ({ mode }) => ({
     plugins: [tailwindcss(), svgr()],
+    base: mode === "github-pages" ? "/AnimalIslandNewTab/" : "/",
   }),
   manifest: {
     name: "Animal Island New Tab",
