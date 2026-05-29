@@ -116,7 +116,7 @@ export function Bookmarks() {
 
   return (
     <div
-      className="mt-8 w-full max-w-3xl"
+      className="mt-5 w-full max-w-3xl sm:mt-8"
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onWheel={handleWheel}
@@ -124,7 +124,7 @@ export function Bookmarks() {
       <div
         key={pageIndex}
         className={[
-          "grid grid-cols-4 gap-4 px-4 sm:grid-cols-8 sm:gap-6",
+          "grid grid-cols-2 gap-4 px-2 min-[420px]:grid-cols-4 sm:grid-cols-8 sm:gap-6 sm:px-4",
           pageDirection === "next"
             ? "animate-[bookmark-slide-next_260ms_ease-out]"
             : "animate-[bookmark-slide-previous_260ms_ease-out]",
@@ -141,7 +141,7 @@ export function Bookmarks() {
               rel="noreferrer"
             >
               <div
-                className="w-16 h-16 sm:w-20 sm:h-20 mb-1 rounded-[28px] flex items-center justify-center transition-all transform group-hover:-translate-y-2 group-hover:scale-105 border-4 border-white shadow-[0_6px_0_#bdaea0]"
+                className="mb-1 flex h-16 w-16 items-center justify-center rounded-[24px] border-4 border-white shadow-[0_6px_0_#bdaea0] transition-all group-hover:-translate-y-2 group-hover:scale-105 sm:h-20 sm:w-20 sm:rounded-[28px]"
                 style={{
                   backgroundColor:
                     bookmarkItem.backgroundColor ?? DEFAULT_BOOKMARK_BACKGROUND,
@@ -168,7 +168,7 @@ export function Bookmarks() {
           );
         })}
         {bookmarkItems.length === 0 ? (
-          <div className="col-span-4 flex flex-col items-center justify-center gap-2 rounded-[28px] border-4 border-dashed border-[#E5D9B4] bg-white/50 px-6 py-8 text-center text-[#8A7966] sm:col-span-8">
+          <div className="col-span-2 flex flex-col items-center justify-center gap-2 rounded-[28px] border-4 border-dashed border-[#E5D9B4] bg-white/50 px-6 py-8 text-center text-[#8A7966] min-[420px]:col-span-4 sm:col-span-8">
             <ExternalLink className="h-8 w-8" />
             <span className="font-bold">暂无书签</span>
           </div>

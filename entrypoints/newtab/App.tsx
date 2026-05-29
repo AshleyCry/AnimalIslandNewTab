@@ -22,7 +22,7 @@ function App() {
   return (
     <>
       <Cursor
-        className="relative flex min-h-195 min-w-290 w-screen h-screen flex-col items-center justify-center overflow-auto px-8 py-10"
+        className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden overflow-y-auto px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-10"
         style={{
           backgroundColor: config.backgroundColor,
         }}
@@ -36,15 +36,15 @@ function App() {
           }}
         />
         <Typewriter>
-          <div className="absolute top-8 left-8 z-10 text-[#59C19D] opacity-80 flex items-center gap-2 font-black text-xl">
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 text-lg font-black text-[#59C19D] opacity-80 sm:top-8 sm:left-8 sm:text-xl">
             <LeafIcon width={32} height={32} className="fill-[#59C19D]" />
             <span>NookInc.</span>
           </div>
         </Typewriter>
-        <main className="relative z-10 flex w-full max-w-5xl flex-col items-center gap-12">
+        <main className="relative z-10 flex w-full max-w-5xl flex-col items-center gap-7 sm:gap-10 lg:gap-12">
           <section className="relative flex w-full justify-center">
             {config.enableDate ? (
-              <div className="absolute -left-10 top-1/2 z-10 -translate-y-1/2 -rotate-6">
+              <div className="absolute -left-10 top-1/2 z-10 hidden -translate-y-1/2 -rotate-7 lg:block [@media(max-height:760px)]:hidden">
                 <Calendar />
               </div>
             ) : null}
@@ -52,7 +52,7 @@ function App() {
               <Clock />
             </div>
             {config.enableWeather ? (
-              <div className="absolute -right-10 top-1/2 z-10 -translate-y-1/2 rotate-5">
+              <div className="absolute -right-10 top-1/2 z-10 hidden -translate-y-1/2 rotate-3 lg:block [@media(max-height:760px)]:hidden">
                 <Weather />
               </div>
             ) : null}
@@ -60,7 +60,13 @@ function App() {
           <SearchBar />
           <Bookmarks />
         </main>
-        <div className="absolute w-screen bottom-8 px-8 z-40 flex justify-between">
+        <SettingsSidebar
+          open={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+        />
+      </Cursor>
+      <Cursor className="fixed bottom-4 z-40 w-screen sm:bottom-8">
+        <div className="flex justify-between px-4 sm:px-8">
           <div className="flex gap-4">
             <Button
               type="primary"
@@ -78,10 +84,6 @@ function App() {
             />
           </div>
         </div>
-        <SettingsSidebar
-          open={isSettingsOpen}
-          onClose={() => setIsSettingsOpen(false)}
-        />
       </Cursor>
     </>
   );

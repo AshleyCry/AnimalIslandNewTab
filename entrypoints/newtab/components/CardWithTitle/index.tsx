@@ -30,7 +30,7 @@ function CardWithTitle({
       {...cardProps}
     >
       {hasTitle ? (
-        <div className="absolute left-1/2 top-0 z-10 min-w-24 max-w-55 whitespace-nowrap -translate-x-1/2 -translate-y-1/2 -rotate-2 rounded-sm bg-[#59C19D] px-5 py-1.5 text-center text-base font-black text-white">
+        <div className="absolute left-1/2 top-0 z-10 min-w-24 max-w-55 whitespace-nowrap -translate-x-1/2 -translate-y-1/2 -rotate-2 rounded-sm bg-[#59C19D] px-5 py-1.5 text-center text-base font-black text-white opacity-80">
           {title}
         </div>
       ) : null}

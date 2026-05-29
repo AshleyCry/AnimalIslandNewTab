@@ -58,10 +58,10 @@ export function SearchBar() {
   };
 
   return (
-    <div className="w-full max-w-2xl relative mt-4">
+    <div className="relative mt-2 w-full max-w-2xl sm:mt-4">
       <form
         onSubmit={handleSearch}
-        className="flex items-center bg-white border-4 border-[#c4b89e] rounded-3xl p-2 shadow-[0_6px_0_#d4c9b4] focus-within:border-[#59C19D] focus-within:shadow-[0_6px_0_#8dccb6] hover:border-[#59C19D] hover:shadow-[0_6px_0_#8dccb6] transition-all"
+        className="flex items-center rounded-3xl border-4 border-[#c4b89e] bg-white p-2 shadow-[0_6px_0_#d4c9b4] transition-all hover:border-[#59C19D] hover:shadow-[0_6px_0_#8dccb6] focus-within:border-[#59C19D] focus-within:shadow-[0_6px_0_#8dccb6] max-[520px]:flex-wrap max-[520px]:gap-2"
       >
         <div className="search-engine-select">
           <Select
@@ -76,7 +76,7 @@ export function SearchBar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="准备去哪座岛屿？..."
-          className="flex-1 bg-transparent px-4 py-2 text-[#6B5A49] font-bold text-lg outline-none placeholder:text-[#C5B7A3]"
+          className="min-w-0 flex-1 bg-transparent px-3 py-2 text-base font-bold text-[#6B5A49] outline-none placeholder:text-[#C5B7A3] sm:px-4 sm:text-lg max-[520px]:order-3 max-[520px]:basis-full"
         />
 
         <button
