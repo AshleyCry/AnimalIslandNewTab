@@ -104,7 +104,12 @@ function SettingsTabPanel() {
       </label>
 
       <label className="flex items-center justify-between gap-4">
-        <span className="text-sm font-black text-[#725d42]">天气定位模式</span>
+        <div className="flex flex-col">
+          <span className="text-sm font-black text-[#725d42]">
+            天气定位模式
+          </span>
+          <span className="text-xs text-[#8a7966]">自动模式根据ip定位</span>
+        </div>
 
         <Select
           options={weatherLocationModeOptions}

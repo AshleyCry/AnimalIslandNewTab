@@ -53,7 +53,7 @@ const DEFAULT_CONFIG: NewtabConfig = {
   clockFormat: "12h",
   enableDate: true,
   enableWeather: true,
-  weatherLocationMode: "manual",
+  weatherLocationMode: "auto",
   manualWeatherLocation: {
     name: "上海",
     latitude: 31.2304,
