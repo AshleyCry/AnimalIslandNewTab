@@ -1,1 +1,30 @@
+@media (min-width: 1440px) and (min-height: 900px) {
+  :root {
+    --large-screen-scale: clamp(1, calc(0.4 + 0.0417vw), 2);
+    --animal-font-size-sm: calc(12px * var(--large-screen-scale));
+    --animal-font-size-base: calc(14px * var(--large-screen-scale));
+    --animal-font-size-lg: calc(16px * var(--large-screen-scale));
+    --animal-spacing-xs: calc(4px * var(--large-screen-scale));
+    --animal-spacing-sm: calc(8px * var(--large-screen-scale));
+    --animal-spacing-md: calc(12px * var(--large-screen-scale));
+    --animal-spacing-lg: calc(16px * var(--large-screen-scale));
+    --animal-spacing-xl: calc(24px * var(--large-screen-scale));
+    /* --animal-height-sm: calc(32px * var(--large-screen-scale));
+    --animal-height-base: calc(40px * var(--large-screen-scale));
+    --animal-height-lg: calc(48px * var(--large-screen-scale));
+    --animal-border-radius-sm: calc(16px * var(--large-screen-scale));
+    --animal-border-radius-base: calc(18px * var(--large-screen-scale));
+    --animal-border-radius-lg: calc(24px * var(--large-screen-scale));
+    --animal-border-width: calc(2px * var(--large-screen-scale)); */
+    font-size: clamp(16px, calc(6.4px + 0.667vw), 32px);
+  }
 
+  [class^="animal-option-"],
+  [class*=" animal-option-"],
+  [class^="animal-tabItem-"],
+  [class*=" animal-tabItem-"],
+  [class^="animal-value-"],
+  [class*=" animal-value-"] {
+    font-size: var(--animal-font-size-base);
+  }
+}

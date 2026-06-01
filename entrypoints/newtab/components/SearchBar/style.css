@@ -1,7 +1,7 @@
 .search-engine-select {
-  width: 130px;
-  min-width: 112px;
-  flex-shrink: 0;
+  width: calc(130px * var(--large-screen-scale, 1));
+  min-width: calc(112px * var(--large-screen-scale, 1));
+  flex: none;
 }
 
 .search-engine-select > [class^="animal-wrapper-"] {

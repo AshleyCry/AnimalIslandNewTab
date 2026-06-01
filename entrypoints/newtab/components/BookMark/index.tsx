@@ -158,12 +158,12 @@ export function Bookmarks() {
                   <ExternalLink className="h-9 w-9 text-[#8A7966]" />
                 )}
               </div>
-              <span
-                className="max-w-[100px] truncate rounded-full bg-white/60 px-3 py-1 text-sm font-bold text-[#8A7966] shadow-sm backdrop-blur-sm"
+              <div
+                className="max-w-25 truncate rounded-full bg-white/60 px-3 py-1 text-sm font-bold text-[#8A7966] shadow-sm backdrop-blur-sm"
                 title={bookmarkItem.title}
               >
                 {bookmarkItem.title}
-              </span>
+              </div>
             </a>
           );
         })}

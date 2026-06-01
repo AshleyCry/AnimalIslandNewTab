@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Cursor, Typewriter } from "animal-island-ui";
-import "./App.css";
 import "animal-island-ui/dist/index.css";
+import "./App.css";
 import { useNewtabStore } from "./store";
 import Calendar from "./components/Calendar";
 import Clock from "./components/Clock";
