@@ -36,7 +36,7 @@ function App() {
           }}
         />
         <Typewriter>
-          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 text-lg font-black text-[#59C19D] opacity-80 sm:top-8 sm:left-8 sm:text-xl">
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 text-lg font-black text-[#59C19D] opacity-80 sm:top-8 sm:left-8 sm:text-xl [@media(max-height:840px)]:hidden">
             <LeafIcon width={32} height={32} className="fill-[#59C19D]" />
             <span>NookInc.</span>
           </div>
@@ -44,7 +44,7 @@ function App() {
         <main className="relative z-10 flex w-full max-w-5xl flex-col items-center gap-7 sm:gap-10 lg:gap-12">
           <section className="relative flex w-full justify-center">
             {config.enableDate ? (
-              <div className="absolute -left-10 top-1/2 z-10 hidden -translate-y-1/2 -rotate-7 lg:block [@media(max-height:760px)]:hidden">
+              <div className="absolute -left-10 top-1/2 z-10 hidden -translate-y-1/2 -rotate-7 lg:block">
                 <Calendar />
               </div>
             ) : null}
@@ -52,7 +52,7 @@ function App() {
               <Clock />
             </div>
             {config.enableWeather ? (
-              <div className="absolute -right-10 top-1/2 z-10 hidden -translate-y-1/2 rotate-3 lg:block [@media(max-height:760px)]:hidden">
+              <div className="absolute -right-10 top-1/2 z-10 hidden -translate-y-1/2 rotate-3 lg:block">
                 <Weather />
               </div>
             ) : null}
