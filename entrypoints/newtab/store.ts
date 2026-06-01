@@ -85,8 +85,8 @@ const DEFAULT_CONFIG: NewtabConfig = {
       backgroundColor: "#fdf8e4",
     },
     {
-      title: "百度",
-      url: "https://www.baidu.com",
+      title: "Dogfight360",
+      url: "https://www.dogfight360.com/blog/",
       backgroundColor: "#fdf8e4",
     },
     {
