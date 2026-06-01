@@ -1,6 +1,10 @@
-@media (min-width: 1440px) and (min-height: 900px) {
+@media (min-width: 1920px) {
   :root {
-    --large-screen-scale: clamp(1, calc(0.4 + 0.0417vw), 2);
+    --large-screen-scale: clamp(
+      1,
+      calc(1 + 0.6 * ((100vw - 1920px) / 1920px)),
+      1.6
+    );
     --animal-font-size-sm: calc(12px * var(--large-screen-scale));
     --animal-font-size-base: calc(14px * var(--large-screen-scale));
     --animal-font-size-lg: calc(16px * var(--large-screen-scale));
@@ -16,7 +20,7 @@
     --animal-border-radius-base: calc(18px * var(--large-screen-scale));
     --animal-border-radius-lg: calc(24px * var(--large-screen-scale));
     --animal-border-width: calc(2px * var(--large-screen-scale)); */
-    font-size: clamp(16px, calc(6.4px + 0.667vw), 32px);
+    font-size: calc(16px * var(--large-screen-scale));
   }
 
   [class^="animal-option-"],
