@@ -4,23 +4,158 @@ import { useNewtabStore } from "../../store";
 
 const PAGE_SIZE = 8;
 const SWIPE_THRESHOLD = 50;
-const WHEEL_THRESHOLD = 20;
+const TOUCHPAD_HORIZONTAL_THRESHOLD = 20;
+const MOUSE_WHEEL_THRESHOLD = 80;
+const WHEEL_AXIS_NOISE_THRESHOLD = 1;
 const WHEEL_COOLDOWN = 450;
+const FAVICON_ATTEMPT_TIMEOUT = 2000;
 const DEFAULT_BOOKMARK_BACKGROUND = "#FDF4E6";
 type PageDirection = "next" | "previous";
+const faviconUrlCache = new Map<string, string | null>();
 
 function clampPage(page: number, pageCount: number) {
   return Math.min(Math.max(page, 0), pageCount - 1);
 }
 
-function getFaviconUrl(url: string) {
+function getFaviconCandidates(url: string) {
   try {
-    const domain = new URL(url).hostname;
+    const { hostname, origin } = new URL(url);
 
-    return `https://favicon.im/${domain}?larger=true`;
+    return Array.from(
+      new Set([
+        `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(
+          origin,
+        )}&sz=128`,
+        `${origin}/apple-touch-icon-precomposed.png`,
+        `${origin}/apple-touch-icon.png`,
+        `https://favicon.im/${hostname}?larger=true`,
+        `https://icons.duckduckgo.com/ip3/${hostname}.ico`,
+        `${origin}/favicon.ico`,
+      ]),
+    );
   } catch {
-    return "";
+    return [];
   }
+}
+
+function loadImageWithTimeout(
+  src: string,
+  timeout: number,
+  signal: AbortSignal,
+) {
+  return new Promise<string>((resolve, reject) => {
+    const image = new Image();
+    let settled = false;
+
+    const finish = (result: string | null) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+      window.clearTimeout(timer);
+      signal.removeEventListener("abort", abort);
+
+      if (result) {
+        resolve(result);
+      } else {
+        reject(new Error("Favicon load failed"));
+      }
+    };
+
+    const abort = () => {
+      image.src = "";
+      finish(null);
+    };
+
+    const timer = window.setTimeout(() => finish(null), timeout);
+
+    image.onload = () => {
+      if (image.naturalWidth > 1 && image.naturalHeight > 1) {
+        finish(src);
+        return;
+      }
+
+      finish(null);
+    };
+    image.onerror = () => finish(null);
+    image.decoding = "async";
+    image.referrerPolicy = "no-referrer";
+    signal.addEventListener("abort", abort, { once: true });
+
+    if (signal.aborted) {
+      abort();
+      return;
+    }
+
+    image.src = src;
+  });
+}
+
+async function resolveFaviconUrl(url: string, signal: AbortSignal) {
+  for (const candidate of getFaviconCandidates(url)) {
+    if (signal.aborted) {
+      return null;
+    }
+
+    try {
+      return await loadImageWithTimeout(
+        candidate,
+        FAVICON_ATTEMPT_TIMEOUT,
+        signal,
+      );
+    } catch {
+      // Try the next source.
+    }
+  }
+
+  return null;
+}
+
+function BookmarkFavicon({ url }: { url: string }) {
+  const [faviconUrl, setFaviconUrl] = useState(() => {
+    const cachedUrl = faviconUrlCache.get(url);
+
+    return cachedUrl ?? "";
+  });
+
+  useEffect(() => {
+    const cachedUrl = faviconUrlCache.get(url);
+
+    if (cachedUrl !== undefined) {
+      setFaviconUrl(cachedUrl ?? "");
+      return;
+    }
+
+    const controller = new AbortController();
+
+    setFaviconUrl("");
+
+    resolveFaviconUrl(url, controller.signal).then((resolvedUrl) => {
+      if (controller.signal.aborted) {
+        return;
+      }
+
+      faviconUrlCache.set(url, resolvedUrl);
+      setFaviconUrl(resolvedUrl ?? "");
+    });
+
+    return () => {
+      controller.abort();
+    };
+  }, [url]);
+
+  if (!faviconUrl) {
+    return <ExternalLink className="h-9 w-9 text-[#8A7966]" />;
+  }
+
+  return (
+    <img
+      alt=""
+      className="h-9 w-9 rounded-lg object-contain"
+      src={faviconUrl}
+    />
+  );
 }
 
 export function Bookmarks() {
@@ -67,14 +202,21 @@ export function Bookmarks() {
       return;
     }
 
-    const delta =
-      Math.abs(event.deltaX) > Math.abs(event.deltaY)
-        ? event.deltaX
-        : event.deltaY;
+    const absDeltaX = Math.abs(event.deltaX);
+    const absDeltaY = Math.abs(event.deltaY);
+    const isHorizontalTouchpadScroll = absDeltaX > absDeltaY;
+    const isMouseWheelScroll =
+      absDeltaY >= MOUSE_WHEEL_THRESHOLD &&
+      absDeltaX <= WHEEL_AXIS_NOISE_THRESHOLD;
 
-    if (Math.abs(delta) < WHEEL_THRESHOLD) {
+    if (
+      !isMouseWheelScroll &&
+      (!isHorizontalTouchpadScroll || absDeltaX < TOUCHPAD_HORIZONTAL_THRESHOLD)
+    ) {
       return;
     }
+
+    const delta = isHorizontalTouchpadScroll ? event.deltaX : event.deltaY;
 
     const now = Date.now();
 
@@ -116,7 +258,7 @@ export function Bookmarks() {
 
   return (
     <div
-      className="mt-5 w-full max-w-3xl sm:mt-8"
+      className="mt-5 w-full max-w-3xl sm:mt-8 min-h-66 sm:min-h-0"
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onWheel={handleWheel}
@@ -124,49 +266,36 @@ export function Bookmarks() {
       <div
         key={pageIndex}
         className={[
-          "grid grid-cols-2 gap-4 px-2 min-[420px]:grid-cols-4 sm:grid-cols-8 sm:gap-6 sm:px-4",
+          "grid grid-cols-2 gap-6 px-2 min-[420px]:grid-cols-4 sm:grid-cols-8 sm:px-4",
           pageDirection === "next"
             ? "animate-[bookmark-slide-next_260ms_ease-out]"
             : "animate-[bookmark-slide-previous_260ms_ease-out]",
         ].join(" ")}
       >
-        {currentPageItems.map((bookmarkItem) => {
-          const faviconUrl = getFaviconUrl(bookmarkItem.url);
-
-          return (
-            <a
-              key={`${bookmarkItem.url}-${bookmarkItem.title}`}
-              href={bookmarkItem.url}
-              className="group flex flex-col items-center gap-2"
-              rel="noreferrer"
+        {currentPageItems.map((bookmarkItem) => (
+          <a
+            key={`${bookmarkItem.url}-${bookmarkItem.title}`}
+            href={bookmarkItem.url}
+            className="group flex flex-col items-center gap-2"
+            rel="noreferrer"
+          >
+            <div
+              className="mb-1 flex h-16 w-16 items-center justify-center rounded-3xl border-4 border-white shadow-[0_6px_0_#bdaea0] transition-all group-hover:-translate-y-2 group-hover:scale-105 sm:h-20 sm:w-20 sm:rounded-[28px]"
+              style={{
+                backgroundColor:
+                  bookmarkItem.backgroundColor ?? DEFAULT_BOOKMARK_BACKGROUND,
+              }}
             >
-              <div
-                className="mb-1 flex h-16 w-16 items-center justify-center rounded-[24px] border-4 border-white shadow-[0_6px_0_#bdaea0] transition-all group-hover:-translate-y-2 group-hover:scale-105 sm:h-20 sm:w-20 sm:rounded-[28px]"
-                style={{
-                  backgroundColor:
-                    bookmarkItem.backgroundColor ?? DEFAULT_BOOKMARK_BACKGROUND,
-                }}
-              >
-                {faviconUrl ? (
-                  <img
-                    alt=""
-                    className="h-9 w-9 rounded-lg object-contain"
-                    src={faviconUrl}
-                    loading="lazy"
-                  />
-                ) : (
-                  <ExternalLink className="h-9 w-9 text-[#8A7966]" />
-                )}
-              </div>
-              <div
-                className="max-w-25 truncate rounded-full bg-white/60 px-3 py-1 text-sm font-bold text-[#8A7966] shadow-sm backdrop-blur-sm"
-                title={bookmarkItem.title}
-              >
-                {bookmarkItem.title}
-              </div>
-            </a>
-          );
-        })}
+              <BookmarkFavicon url={bookmarkItem.url} />
+            </div>
+            <div
+              className="max-w-25 truncate rounded-full bg-white/60 px-3 py-1 text-sm font-bold text-[#8A7966] shadow-sm backdrop-blur-sm"
+              title={bookmarkItem.title}
+            >
+              {bookmarkItem.title}
+            </div>
+          </a>
+        ))}
         {bookmarkItems.length === 0 ? (
           <div className="col-span-2 flex flex-col items-center justify-center gap-2 rounded-[28px] border-4 border-dashed border-[#E5D9B4] bg-white/50 px-6 py-8 text-center text-[#8A7966] min-[420px]:col-span-4 sm:col-span-8">
             <ExternalLink className="h-8 w-8" />

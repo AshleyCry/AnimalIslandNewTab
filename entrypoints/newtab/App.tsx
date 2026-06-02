@@ -22,7 +22,7 @@ function App() {
   return (
     <>
       <Cursor
-        className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden overflow-y-auto px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-10"
+        className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden overflow-y-auto p-5"
         style={{
           backgroundColor: config.backgroundColor,
         }}
