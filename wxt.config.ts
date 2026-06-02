@@ -11,7 +11,7 @@ export default defineConfig({
   manifest: {
     name: "Animal Island New Tab",
     description: "A cozy Animal Island-inspired new tab page.",
-    version: "1.0.0",
+    version: "1.0.1",
     manifest_version: 3,
     permissions: ["geolocation"],
     host_permissions: [
