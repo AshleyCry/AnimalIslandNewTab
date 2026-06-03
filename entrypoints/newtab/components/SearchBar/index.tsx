@@ -61,7 +61,7 @@ export function SearchBar() {
     <div className="relative mt-2 w-full max-w-2xl sm:mt-4">
       <form
         onSubmit={handleSearch}
-        className="flex items-center rounded-3xl border-4 border-[#c4b89e] bg-white p-2 shadow-[0_6px_0_#d4c9b4] transition-all hover:border-[#59C19D] hover:shadow-[0_6px_0_#8dccb6] focus-within:border-[#59C19D] focus-within:shadow-[0_6px_0_#8dccb6] max-[520px]:flex-wrap max-[520px]:gap-2"
+        className="flex items-center rounded-3xl border-4 border-[#c4b89e] bg-white p-2 shadow-[0_5px_0_#d4c9b4] transition-all hover:border-[#59C19D] hover:shadow-[0_5px_0_#8dccb6] focus-within:border-[#59C19D] focus-within:shadow-[0_5px_0_#8dccb6] max-[520px]:flex-wrap max-[520px]:gap-2"
       >
         <div className="search-engine-select">
           <Select

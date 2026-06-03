@@ -38,7 +38,7 @@ function App() {
         <Typewriter>
           <div className="absolute top-4 left-4 z-10 flex items-center gap-2 text-lg font-black text-[#59C19D] opacity-80 sm:top-8 sm:left-8 sm:text-xl [@media(max-height:840px)]:hidden">
             <LeafIcon width={32} height={32} className="fill-[#59C19D]" />
-            <span>NookInc.</span>
+            <span>Nook Inc.</span>
           </div>
         </Typewriter>
         <main className="relative z-10 flex w-full max-w-5xl flex-col items-center gap-7 sm:gap-10 lg:gap-12">

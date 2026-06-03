@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type WheelEvent } from "react";
-import { ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { useNewtabStore } from "../../store";
 
 const PAGE_SIZE = 8;
@@ -171,6 +171,8 @@ export function Bookmarks() {
 
     return bookmarkItems.slice(start, start + PAGE_SIZE);
   }, [bookmarkItems, pageIndex]);
+  const canGoPrevious = pageIndex > 0;
+  const canGoNext = pageIndex < pageCount - 1;
 
   useEffect(() => {
     setPageIndex((currentPage) => clampPage(currentPage, pageCount));
@@ -216,6 +218,8 @@ export function Bookmarks() {
       return;
     }
 
+    event.preventDefault();
+
     const delta = isHorizontalTouchpadScroll ? event.deltaX : event.deltaY;
 
     const now = Date.now();
@@ -258,15 +262,47 @@ export function Bookmarks() {
 
   return (
     <div
-      className="mt-5 w-full max-w-3xl sm:mt-8 min-h-66 sm:min-h-0"
+      className="relative mt-5 w-full max-w-3xl sm:mt-8 min-h-66 sm:min-h-0"
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onWheel={handleWheel}
     >
+      {pageCount > 1 ? (
+        <>
+          <button
+            type="button"
+            aria-label="上一页书签"
+            disabled={!canGoPrevious}
+            className={[
+              "absolute left-0 top-1/2 sm:top-11 z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-3 border-white bg-[#FDF4E6] text-[#8A7966] shadow-[0_4px_0_#bdaea0] transition-all sm:-translate-x-full",
+              canGoPrevious
+                ? "hover:-translate-y-[calc(50%+2px)] hover:bg-[#59C19D] hover:text-white active:translate-y-[calc(-50%+2px)] active:shadow-[0_2px_0_#bdaea0]"
+                : "cursor-not-allowed opacity-45 shadow-[0_2px_0_#d7cbbf]",
+            ].join(" ")}
+            onClick={goToPreviousPage}
+          >
+            <ChevronLeft className="h-5 w-5" strokeWidth={3} />
+          </button>
+          <button
+            type="button"
+            aria-label="下一页书签"
+            disabled={!canGoNext}
+            className={[
+              "absolute right-0 top-1/2 sm:top-11 z-10 flex h-8 w-8 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-3 border-white bg-[#FDF4E6] text-[#8A7966] shadow-[0_4px_0_#bdaea0] transition-all sm:translate-x-full",
+              canGoNext
+                ? "hover:-translate-y-[calc(50%+2px)] hover:bg-[#59C19D] hover:text-white active:translate-y-[calc(-50%+2px)] active:shadow-[0_2px_0_#bdaea0]"
+                : "cursor-not-allowed opacity-45 shadow-[0_2px_0_#d7cbbf]",
+            ].join(" ")}
+            onClick={goToNextPage}
+          >
+            <ChevronRight className="h-5 w-5" strokeWidth={3} />
+          </button>
+        </>
+      ) : null}
       <div
         key={pageIndex}
         className={[
-          "grid grid-cols-2 gap-6 px-2 min-[420px]:grid-cols-4 sm:grid-cols-8 sm:px-4",
+          "grid grid-cols-2 gap-6 px-2 min-[420px]:grid-cols-4 sm:grid-cols-8 sm:px-6",
           pageDirection === "next"
             ? "animate-[bookmark-slide-next_260ms_ease-out]"
             : "animate-[bookmark-slide-previous_260ms_ease-out]",
@@ -289,7 +325,7 @@ export function Bookmarks() {
               <BookmarkFavicon url={bookmarkItem.url} />
             </div>
             <div
-              className="max-w-25 truncate rounded-full bg-white/60 px-3 py-1 text-sm font-bold text-[#8A7966] shadow-sm backdrop-blur-sm"
+              className="w-20 truncate text-center rounded-full bg-[#fff9da] px-3 py-1 text-sm font-bold text-[#8A7966] shadow-sm backdrop-blur-sm"
               title={bookmarkItem.title}
             >
               {bookmarkItem.title}

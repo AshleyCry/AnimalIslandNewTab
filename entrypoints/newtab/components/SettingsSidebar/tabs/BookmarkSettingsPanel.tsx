@@ -14,7 +14,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Button } from "animal-island-ui";
-import { GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { GripVertical, Pencil, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { useNewtabStore, type BookmarkItem } from "../../../store";
 import BookmarkEditorModal from "./BookmarkEditorModal";
 
@@ -161,12 +161,18 @@ function BookmarkSettingsPanel({ onBack }: { onBack: () => void }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <Button type="text" onClick={onBack}>
+        <Button
+          type="primary"
+          icon={<ArrowLeft className="h-4 w-4" />}
+          size="small"
+          onClick={onBack}
+        >
           返回
         </Button>
         <Button
           type="primary"
           icon={<Plus className="h-4 w-4" />}
+          size="small"
           onClick={handleAdd}
         >
           添加
