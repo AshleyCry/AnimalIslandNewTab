@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type WheelEvent } from "react";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { useNewtabStore } from "../../store";
+import { useBookmarkFavicon } from "./useBookmarkFavicon";
 
 const PAGE_SIZE = 8;
 const SWIPE_THRESHOLD = 50;
@@ -8,142 +9,15 @@ const TOUCHPAD_HORIZONTAL_THRESHOLD = 20;
 const MOUSE_WHEEL_THRESHOLD = 80;
 const WHEEL_AXIS_NOISE_THRESHOLD = 1;
 const WHEEL_COOLDOWN = 450;
-const FAVICON_ATTEMPT_TIMEOUT = 2000;
 const DEFAULT_BOOKMARK_BACKGROUND = "#FDF4E6";
 type PageDirection = "next" | "previous";
-const faviconUrlCache = new Map<string, string | null>();
 
 function clampPage(page: number, pageCount: number) {
   return Math.min(Math.max(page, 0), pageCount - 1);
 }
 
-function getFaviconCandidates(url: string) {
-  try {
-    const { hostname, origin } = new URL(url);
-
-    return Array.from(
-      new Set([
-        `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(
-          origin,
-        )}&sz=128`,
-        `${origin}/apple-touch-icon-precomposed.png`,
-        `${origin}/apple-touch-icon.png`,
-        `https://favicon.im/${hostname}?larger=true`,
-        `https://icons.duckduckgo.com/ip3/${hostname}.ico`,
-        `${origin}/favicon.ico`,
-      ]),
-    );
-  } catch {
-    return [];
-  }
-}
-
-function loadImageWithTimeout(
-  src: string,
-  timeout: number,
-  signal: AbortSignal,
-) {
-  return new Promise<string>((resolve, reject) => {
-    const image = new Image();
-    let settled = false;
-
-    const finish = (result: string | null) => {
-      if (settled) {
-        return;
-      }
-
-      settled = true;
-      window.clearTimeout(timer);
-      signal.removeEventListener("abort", abort);
-
-      if (result) {
-        resolve(result);
-      } else {
-        reject(new Error("Favicon load failed"));
-      }
-    };
-
-    const abort = () => {
-      image.src = "";
-      finish(null);
-    };
-
-    const timer = window.setTimeout(() => finish(null), timeout);
-
-    image.onload = () => {
-      if (image.naturalWidth > 1 && image.naturalHeight > 1) {
-        finish(src);
-        return;
-      }
-
-      finish(null);
-    };
-    image.onerror = () => finish(null);
-    image.decoding = "async";
-    image.referrerPolicy = "no-referrer";
-    signal.addEventListener("abort", abort, { once: true });
-
-    if (signal.aborted) {
-      abort();
-      return;
-    }
-
-    image.src = src;
-  });
-}
-
-async function resolveFaviconUrl(url: string, signal: AbortSignal) {
-  for (const candidate of getFaviconCandidates(url)) {
-    if (signal.aborted) {
-      return null;
-    }
-
-    try {
-      return await loadImageWithTimeout(
-        candidate,
-        FAVICON_ATTEMPT_TIMEOUT,
-        signal,
-      );
-    } catch {
-      // Try the next source.
-    }
-  }
-
-  return null;
-}
-
 function BookmarkFavicon({ url }: { url: string }) {
-  const [faviconUrl, setFaviconUrl] = useState(() => {
-    const cachedUrl = faviconUrlCache.get(url);
-
-    return cachedUrl ?? "";
-  });
-
-  useEffect(() => {
-    const cachedUrl = faviconUrlCache.get(url);
-
-    if (cachedUrl !== undefined) {
-      setFaviconUrl(cachedUrl ?? "");
-      return;
-    }
-
-    const controller = new AbortController();
-
-    setFaviconUrl("");
-
-    resolveFaviconUrl(url, controller.signal).then((resolvedUrl) => {
-      if (controller.signal.aborted) {
-        return;
-      }
-
-      faviconUrlCache.set(url, resolvedUrl);
-      setFaviconUrl(resolvedUrl ?? "");
-    });
-
-    return () => {
-      controller.abort();
-    };
-  }, [url]);
+  const faviconUrl = useBookmarkFavicon(url);
 
   if (!faviconUrl) {
     return <ExternalLink className="h-9 w-9 text-[#8A7966]" />;

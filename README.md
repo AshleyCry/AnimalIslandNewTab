@@ -9,9 +9,11 @@
 - 日期组件：展示当前年月日、星期和农历日期。
 - 天气组件：基于 Open-Meteo 获取天气、温度、湿度和定位信息。
 - 搜索栏：支持 Google、Bing、百度和 DuckDuckGo。
-- 快捷方式：支持自定义快捷方式、分页展示、拖拽排序、编辑和删除。
+- 背景设置：支持纯色背景、预设图片背景和本地自定义图片背景。
+- 快捷方式：支持自定义快捷方式、分页展示、编辑和删除。
+- 快捷方式图标缓存：获取到的 favicon 会缓存到 IndexedDB，后续打开页面时优先使用本地缓存。
 - 设置侧边栏：支持页面配置、配置导入和 JSON 导出。
-- 配置持久化：所有配置会保存到 `localStorage`。
+- 配置持久化：页面配置保存到 `localStorage`，图片和图标等二进制缓存保存到 IndexedDB。
 
 ## 技术栈
 
@@ -103,7 +105,9 @@ animal-cross-newtab-config
 
 主要配置项包括：
 
+- `backgroundType`：背景类型，支持 `color` 和 `image`
 - `backgroundColor`：页面背景颜色
+- `backgroundPresetImage`：当前选中的预设图片背景 ID；选择自定义图片时值为 `custom`
 - `clockFormat`：时间制，支持 `12h` 和 `24h`
 - `enableDate`：是否显示日期组件
 - `enableWeather`：是否显示天气组件
@@ -114,6 +118,17 @@ animal-cross-newtab-config
 
 可在右下角设置按钮中修改部分配置，也可以通过「配置同步」导入或导出 JSON 配置。
 
+自定义背景图片不会写入 JSON 配置文件，而是保存到 IndexedDB。导入或导出配置时只会同步背景类型和图片选择状态，不会同步本地上传的图片文件。
+
+## 本地缓存
+
+项目使用 IndexedDB 保存运行时产生的二进制数据：
+
+- `animal-cross-newtab-background`：用户上传的自定义背景图片
+- `animal-cross-newtab-favicons`：快捷方式 favicon 缓存
+
+这些缓存不会进入配置导出文件。清理浏览器站点数据或扩展数据会删除这些本地缓存。
+
 ## 天气数据
 
 天气数据使用 Open-Meteo：
@@ -123,15 +138,26 @@ animal-cross-newtab-config
 
 自动定位模式会请求浏览器定位权限。手动定位模式会使用配置中的城市名称和经纬度。
 
+快捷方式 favicon 会尝试从以下来源获取：
+
+- `https://www.google.com/s2/favicons`
+- `https://icons.duckduckgo.com/ip3`
+- `https://favicon.im`
+- 目标网站自身的 `apple-touch-icon` / `favicon.ico`
+
 ## 项目结构
 
 ```text
 entrypoints/
   newtab/
     App.tsx
+    backgroundPresets.ts
+    customBackgroundImage.ts
     store.ts
     components/
       BookMark/
+        favicon.ts
+        useBookmarkFavicon.ts
       Calendar/
       CardWithTitle/
       Clock/
@@ -147,3 +173,8 @@ entrypoints/
 - 新标签页功能通过 `chrome_url_overrides.newtab` 启用。
 - 如果修改了 `wxt.config.ts` 中的权限或 host permissions，需要重新加载扩展。
 - `localStorage` 中已有旧配置时，新字段会使用默认配置兜底。
+- 预设背景图片会随扩展一起打包，新增大图会明显增加构建产物体积。
+
+## 版权声明
+
+本项目是非官方的粉丝向新标签页插件，仅用于学习和个人使用。项目中涉及的《动物森友会》风格、名称、图形元素、角色意象、素材灵感及相关商标版权归 Nintendo 及其相关权利方所有。本项目与 Nintendo 没有关联，也未获得其赞助、授权或认可。

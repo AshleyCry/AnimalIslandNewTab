@@ -17,6 +17,9 @@ export default defineConfig({
     host_permissions: [
       "https://api.open-meteo.com/*",
       "https://geocoding-api.open-meteo.com/*",
+      "https://favicon.im/*",
+      "https://icons.duckduckgo.com/*",
+      "https://www.google.com/*",
     ],
     chrome_url_overrides: {
       newtab: "newtab.html",

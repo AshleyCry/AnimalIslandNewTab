@@ -3,6 +3,7 @@ import { create } from "zustand";
 export type ClockFormat = "12h" | "24h";
 type WeatherTemperatureDisplay = "current" | "range";
 export type WeatherLocationMode = "auto" | "manual";
+export type BackgroundType = "color" | "image";
 
 export type BookmarkItem = {
   title: string;
@@ -19,7 +20,9 @@ type ManualWeatherLocation = {
 export type SearchEngine = "google" | "bing" | "duckduckgo" | "baidu";
 
 export type NewtabConfig = {
+  backgroundType: BackgroundType;
   backgroundColor: string;
+  backgroundPresetImage: string;
   enableClock: boolean;
   clockFormat: ClockFormat;
   enableDate: boolean;
@@ -41,14 +44,18 @@ export type NewtabConfig = {
 type NewtabStore = {
   config: NewtabConfig;
   bigLoading: boolean;
+  backgroundCustomImageUpdatedAt: number;
   updateConfig: (config: Partial<NewtabConfig>) => void;
   setBigLoading: (bigLoading: boolean) => void;
+  touchCustomBackgroundImage: () => void;
 };
 
 const CONFIG_STORAGE_KEY = "animal-cross-newtab-config";
 
 const DEFAULT_CONFIG: NewtabConfig = {
+  backgroundType: "color",
   backgroundColor: "#f8efbc",
+  backgroundPresetImage: "0.jpg",
   enableClock: true,
   clockFormat: "12h",
   enableDate: true,
@@ -185,6 +192,7 @@ function saveConfigToLocalStorage(config: NewtabConfig) {
 export const useNewtabStore = create<NewtabStore>((set) => ({
   config: loadConfigFromLocalStorage(),
   bigLoading: false, // 控制全局loading画面
+  backgroundCustomImageUpdatedAt: 0,
   updateConfig: (config) =>
     set((state) => {
       const nextConfig = mergeConfig({
@@ -199,4 +207,6 @@ export const useNewtabStore = create<NewtabStore>((set) => ({
       };
     }),
   setBigLoading: (bigLoading) => set({ bigLoading }),
+  touchCustomBackgroundImage: () =>
+    set({ backgroundCustomImageUpdatedAt: Date.now() }),
 }));
