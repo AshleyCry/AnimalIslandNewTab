@@ -3,6 +3,7 @@
 一个基于 WXT、React 和 animal-island-ui 开发的动物森友会风格浏览器新标签页插件。
 
 chrome 插件地址：https://chromewebstore.google.com/detail/animal-island-new-tab/fbjccmnikphgnefincllnfhkjkcndjia
+
 预览页面：https://ashleycry.github.io/AnimalIslandNewTab
 
 ## 功能
