@@ -18,9 +18,9 @@ function getFaviconCandidates(url: string) {
 
     // 先试稳定的第三方服务，再回退到网站自己的图标文件。
     return [
-      `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(
-        origin,
-      )}&sz=128`,
+      // `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(
+      //   origin,
+      // )}&sz=128`,
       `https://icons.duckduckgo.com/ip3/${hostname}.ico`,
       `https://favicon.im/${hostname}?larger=true`,
       `${origin}/apple-touch-icon-precomposed.png`,

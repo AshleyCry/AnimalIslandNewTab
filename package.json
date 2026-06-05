@@ -2,7 +2,7 @@
   "name": "animal-island-newtab",
   "description": "Animal Island New Tab",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "type": "module",
   "scripts": {

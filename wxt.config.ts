@@ -11,11 +11,12 @@ export default defineConfig({
   manifest: {
     name: "Animal Island New Tab",
     description: "A cozy Animal Island-inspired new tab page.",
-    version: "1.0.3",
+    version: "1.0.4",
     manifest_version: 3,
     permissions: ["geolocation"],
     host_permissions: [
       "https://api.open-meteo.com/*",
+      "https://air-quality-api.open-meteo.com/*",
       "https://geocoding-api.open-meteo.com/*",
       "https://favicon.im/*",
       "https://icons.duckduckgo.com/*",

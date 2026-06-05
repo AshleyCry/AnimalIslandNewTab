@@ -2,22 +2,89 @@ import { useEffect, useState } from "react";
 import { useNewtabStore } from "../store";
 
 const OPEN_METEO_API_URL = "https://api.open-meteo.com/v1/forecast";
+const OPEN_METEO_AIR_QUALITY_API_URL =
+  "https://air-quality-api.open-meteo.com/v1/air-quality";
 
 type OpenMeteoResponse = {
   current?: {
     temperature_2m?: number;
     relative_humidity_2m?: number;
+    apparent_temperature?: number;
+    precipitation?: number;
+    pressure_msl?: number;
+    wind_speed_10m?: number;
+    wind_direction_10m?: number;
+    wind_gusts_10m?: number;
     weather_code?: number;
   };
+  hourly?: {
+    time?: string[];
+    temperature_2m?: number[];
+    apparent_temperature?: number[];
+    precipitation?: number[];
+    precipitation_probability?: number[];
+    relative_humidity_2m?: number[];
+    weather_code?: number[];
+    wind_speed_10m?: number[];
+  };
   daily?: {
+    time?: string[];
+    weather_code?: number[];
     temperature_2m_min?: number[];
     temperature_2m_max?: number[];
+    precipitation_sum?: number[];
+    precipitation_probability_max?: number[];
+    sunrise?: string[];
+    sunset?: string[];
+    uv_index_max?: number[];
+    wind_speed_10m_max?: number[];
+  };
+};
+
+type OpenMeteoAirQualityResponse = {
+  current?: {
+    us_aqi?: number;
+    pm2_5?: number;
+    pm10?: number;
   };
 };
 
 type OpenMeteoErrorResponse = {
   error?: boolean;
   reason?: string;
+};
+
+export type DailyWeatherForecast = {
+  date: string;
+  condition: string;
+  weatherType: string;
+  lowTemperature: number;
+  highTemperature: number;
+  precipitationSum: number;
+  precipitationProbability: number;
+  uvIndex: number;
+  windSpeed: number;
+  sunrise: string;
+  sunset: string;
+};
+
+export type HourlyWeatherForecast = {
+  time: string;
+  condition: string;
+  weatherType: string;
+  temperature: number;
+  apparentTemperature: number;
+  precipitation: number;
+  precipitationProbability: number;
+  humidity: number;
+  windSpeed: number;
+};
+
+export type AirQualityData = {
+  aqi: number | null;
+  level: string;
+  pm25: number | null;
+  pm10: number | null;
 };
 
 export type OpenWeatherData = {
@@ -27,6 +94,18 @@ export type OpenWeatherData = {
   lowTemperature: number;
   highTemperature: number;
   humidity: number;
+  apparentTemperature: number;
+  precipitation: number;
+  pressure: number;
+  windSpeed: number;
+  windDirection: number;
+  windGusts: number;
+  sunrise: string;
+  sunset: string;
+  uvIndex: number;
+  airQuality: AirQualityData;
+  dailyForecast: DailyWeatherForecast[];
+  hourlyForecast: HourlyWeatherForecast[];
   location: string;
 };
 
@@ -96,19 +175,127 @@ function getWeatherInfo(weatherCode?: number) {
   return { condition: "未知天气", weatherType: "Clouds" };
 }
 
+function roundNumber(value: number | undefined, fallback = 0) {
+  return Math.round(value ?? fallback);
+}
+
+function roundOneDecimal(value: number | undefined, fallback = 0) {
+  return Math.round((value ?? fallback) * 10) / 10;
+}
+
+function getAirQualityLevel(aqi?: number) {
+  if (aqi === undefined) {
+    return "未知";
+  }
+
+  if (aqi <= 50) {
+    return "优";
+  }
+
+  if (aqi <= 100) {
+    return "良";
+  }
+
+  if (aqi <= 150) {
+    return "轻度污染";
+  }
+
+  if (aqi <= 200) {
+    return "中度污染";
+  }
+
+  if (aqi <= 300) {
+    return "重度污染";
+  }
+
+  return "严重污染";
+}
+
+function normalizeAirQuality(
+  response: OpenMeteoAirQualityResponse | null,
+): AirQualityData {
+  const aqi = response?.current?.us_aqi;
+
+  return {
+    aqi: aqi === undefined ? null : roundNumber(aqi),
+    level: getAirQualityLevel(aqi),
+    pm25:
+      response?.current?.pm2_5 === undefined
+        ? null
+        : roundOneDecimal(response.current.pm2_5),
+    pm10:
+      response?.current?.pm10 === undefined
+        ? null
+        : roundOneDecimal(response.current.pm10),
+  };
+}
+
 function normalizeWeather(
   response: OpenMeteoResponse,
+  airQualityResponse: OpenMeteoAirQualityResponse | null,
   locationName?: string,
 ): OpenWeatherData {
   const weatherInfo = getWeatherInfo(response.current?.weather_code);
+  const dailyForecast = (response.daily?.time ?? []).map((date, index) => {
+    const dailyWeatherInfo = getWeatherInfo(response.daily?.weather_code?.[index]);
+
+    return {
+      date,
+      condition: dailyWeatherInfo.condition,
+      weatherType: dailyWeatherInfo.weatherType,
+      lowTemperature: roundNumber(response.daily?.temperature_2m_min?.[index]),
+      highTemperature: roundNumber(response.daily?.temperature_2m_max?.[index]),
+      precipitationSum: roundOneDecimal(response.daily?.precipitation_sum?.[index]),
+      precipitationProbability: roundNumber(
+        response.daily?.precipitation_probability_max?.[index],
+      ),
+      uvIndex: roundOneDecimal(response.daily?.uv_index_max?.[index]),
+      windSpeed: roundOneDecimal(response.daily?.wind_speed_10m_max?.[index]),
+      sunrise: response.daily?.sunrise?.[index] ?? "",
+      sunset: response.daily?.sunset?.[index] ?? "",
+    };
+  });
+  const hourlyForecast = (response.hourly?.time ?? []).map((time, index) => {
+    const hourlyWeatherInfo = getWeatherInfo(
+      response.hourly?.weather_code?.[index],
+    );
+
+    return {
+      time,
+      condition: hourlyWeatherInfo.condition,
+      weatherType: hourlyWeatherInfo.weatherType,
+      temperature: roundNumber(response.hourly?.temperature_2m?.[index]),
+      apparentTemperature: roundNumber(
+        response.hourly?.apparent_temperature?.[index],
+      ),
+      precipitation: roundOneDecimal(response.hourly?.precipitation?.[index]),
+      precipitationProbability: roundNumber(
+        response.hourly?.precipitation_probability?.[index],
+      ),
+      humidity: roundNumber(response.hourly?.relative_humidity_2m?.[index]),
+      windSpeed: roundOneDecimal(response.hourly?.wind_speed_10m?.[index]),
+    };
+  });
 
   return {
     condition: weatherInfo.condition,
     weatherType: weatherInfo.weatherType,
-    currentTemperature: Math.round(response.current?.temperature_2m ?? 0),
-    lowTemperature: Math.round(response.daily?.temperature_2m_min?.[0] ?? 0),
-    highTemperature: Math.round(response.daily?.temperature_2m_max?.[0] ?? 0),
-    humidity: Math.round(response.current?.relative_humidity_2m ?? 0),
+    currentTemperature: roundNumber(response.current?.temperature_2m),
+    lowTemperature: roundNumber(response.daily?.temperature_2m_min?.[0]),
+    highTemperature: roundNumber(response.daily?.temperature_2m_max?.[0]),
+    humidity: roundNumber(response.current?.relative_humidity_2m),
+    apparentTemperature: roundNumber(response.current?.apparent_temperature),
+    precipitation: roundOneDecimal(response.current?.precipitation),
+    pressure: roundNumber(response.current?.pressure_msl),
+    windSpeed: roundOneDecimal(response.current?.wind_speed_10m),
+    windDirection: roundNumber(response.current?.wind_direction_10m),
+    windGusts: roundOneDecimal(response.current?.wind_gusts_10m),
+    sunrise: response.daily?.sunrise?.[0] ?? "",
+    sunset: response.daily?.sunset?.[0] ?? "",
+    uvIndex: roundOneDecimal(response.daily?.uv_index_max?.[0]),
+    airQuality: normalizeAirQuality(airQualityResponse),
+    dailyForecast,
+    hourlyForecast,
     location: locationName || "",
   };
 }
@@ -121,12 +308,28 @@ async function fetchOpenWeather({
   const searchParams = new URLSearchParams({
     latitude: String(latitude),
     longitude: String(longitude),
-    current: "temperature_2m,relative_humidity_2m,weather_code",
-    daily: "temperature_2m_max,temperature_2m_min",
-    forecast_days: "1",
+    current:
+      "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code",
+    hourly:
+      "temperature_2m,apparent_temperature,precipitation,precipitation_probability,relative_humidity_2m,weather_code,wind_speed_10m",
+    daily:
+      "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset,uv_index_max,wind_speed_10m_max",
+    forecast_days: "15",
+    forecast_hours: "24",
     timezone: "auto",
   });
-  const response = await fetch(`${OPEN_METEO_API_URL}?${searchParams}`);
+  const airQualitySearchParams = new URLSearchParams({
+    latitude: String(latitude),
+    longitude: String(longitude),
+    current: "us_aqi,pm2_5,pm10",
+    timezone: "auto",
+  });
+  const [response, airQualityResponse] = await Promise.all([
+    fetch(`${OPEN_METEO_API_URL}?${searchParams}`),
+    fetch(`${OPEN_METEO_AIR_QUALITY_API_URL}?${airQualitySearchParams}`).catch(
+      () => null,
+    ),
+  ]);
 
   if (!response.ok) {
     const errorBody = (await response
@@ -137,8 +340,14 @@ async function fetchOpenWeather({
     throw new Error(`天气数据获取失败：${response.status} ${message}`);
   }
 
+  const airQualityData =
+    airQualityResponse && airQualityResponse.ok
+      ? ((await airQualityResponse.json()) as OpenMeteoAirQualityResponse)
+      : null;
+
   return normalizeWeather(
     (await response.json()) as OpenMeteoResponse,
+    airQualityData,
     locationName,
   );
 }

@@ -2,12 +2,16 @@
 
 一个基于 WXT、React 和 animal-island-ui 开发的动物森友会风格浏览器新标签页插件。
 
+chrome 插件地址：https://chromewebstore.google.com/detail/animal-island-new-tab/fbjccmnikphgnefincllnfhkjkcndjia
+预览页面：https://ashleycry.github.io/AnimalIslandNewTab
+
 ## 功能
 
 - 新标签页替换：打开浏览器新标签页时展示自定义页面。
 - 时间组件：支持 12 小时制和 24 小时制。
 - 日期组件：展示当前年月日、星期和农历日期。
-- 天气组件：基于 Open-Meteo 获取天气、温度、湿度和定位信息。
+- 天气组件：基于 Open-Meteo 获取天气、温度、湿度、定位和空气质量信息。
+- 天气详情侧边栏：点击天气卡片可查看当前天气、未来 24 小时天气、近 15 日天气、紫外线、体感温度、风力、日出日落、气压等详情。
 - 搜索栏：支持 Google、Bing、百度和 DuckDuckGo。
 - 背景设置：支持纯色背景、预设图片背景和本地自定义图片背景。
 - 快捷方式：支持自定义快捷方式、分页展示、编辑和删除。
@@ -134,10 +138,12 @@ animal-cross-newtab-config
 天气数据使用 Open-Meteo：
 
 - `https://api.open-meteo.com/*`
+- `https://air-quality-api.open-meteo.com/*`
 - `https://geocoding-api.open-meteo.com/*`
 
 自动定位模式会请求浏览器定位权限。手动定位模式会使用配置中的城市名称和经纬度。
 
+天气卡片和天气详情共用同一次数据加载。
 快捷方式 favicon 会尝试从以下来源获取：
 
 - `https://www.google.com/s2/favicons`
@@ -163,7 +169,10 @@ entrypoints/
       Clock/
       SearchBar/
       SettingsSidebar/
+      Sidebar/
       Weather/
+        WeatherDetailSidebar.tsx
+        weatherIcons.ts
     hooks/
       useOpenWeather.ts
 ```
