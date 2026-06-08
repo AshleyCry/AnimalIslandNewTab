@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from "react";
-import { Button } from "animal-island-ui";
+import { Button, Typewriter } from "animal-island-ui";
 import { Download, Upload } from "lucide-react";
 import { useNewtabStore, type NewtabConfig } from "../../../store";
 
@@ -90,9 +90,11 @@ function ConfigSyncTabPanel() {
         </Button>
       </div>
       {syncMessage ? (
-        <div className="rounded-xl bg-[#f4efe3] px-3 py-2 text-[#725d42]">
-          {syncMessage}
-        </div>
+        <Typewriter>
+          <div className="rounded-xl bg-[#f4efe3] px-3 py-2 text-[#725d42]">
+            {syncMessage}
+          </div>
+        </Typewriter>
       ) : null}
     </div>
   );

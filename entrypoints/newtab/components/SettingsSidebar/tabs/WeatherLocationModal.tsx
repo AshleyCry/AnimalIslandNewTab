@@ -126,7 +126,7 @@ function WeatherLocationModal({ open, onClose }: WeatherLocationModalProps) {
         ) : null}
 
         {locationResults.length > 0 ? (
-          <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+          <div className="weather-detail-scrollbar max-h-72 space-y-2 overflow-y-auto pr-1">
             {locationResults.map((location) => (
               <button
                 key={location.id}

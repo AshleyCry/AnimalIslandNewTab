@@ -277,10 +277,10 @@ function SettingsTabPanel() {
           <span className="mt-3 text-sm font-black text-[#725d42]">
             背景图片
           </span>
-          <div className="flex max-w-62 flex-col gap-3 rounded-2xl bg-[#fff9] p-3">
+          <div className="flex max-w-62 flex-col gap-3 rounded-2xl bg-[#fff9] p-2">
             <div
               className={[
-                "grid grid-cols-3 gap-2 overflow-hidden transition-all duration-300 ease-in-out py-1",
+                "grid grid-cols-3 gap-2 overflow-hidden transition-all duration-300 ease-in-out p-1",
                 isBackgroundPresetExpanded ? "" : "max-h-24",
               ].join(" ")}
             >
@@ -371,7 +371,6 @@ function SettingsTabPanel() {
           <span className="text-sm font-black text-[#725d42]">
             天气定位模式
           </span>
-          <span className="text-xs text-[#8a7966]">自动模式根据ip定位</span>
         </div>
 
         <Select

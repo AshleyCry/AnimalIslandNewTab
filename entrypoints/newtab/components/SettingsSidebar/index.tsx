@@ -12,7 +12,7 @@ type SettingsSidebarProps = {
 };
 
 const TAB_PANEL_CLASS_NAME =
-  "max-h-[calc(100vh-330px)] overflow-y-auto bg-[#f4efe3] p-4 text-sm font-bold text-[#8a7966]";
+  "max-h-[calc(100vh-330px)] weather-detail-scrollbar overflow-y-auto bg-[#f4efe3] p-4 text-sm font-bold text-[#8a7966]";
 
 function isSettingsTab(value: string): value is SettingsTab {
   return value === "settings" || value === "sync";
@@ -51,7 +51,12 @@ function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
   ];
 
   return (
-    <Sidebar open={open} title="设置" onClose={onClose} ariaLabel="关闭设置侧边栏">
+    <Sidebar
+      open={open}
+      title="设置"
+      onClose={onClose}
+      ariaLabel="关闭设置侧边栏"
+    >
       <Tabs
         className=" bg-[#f4efe3]!"
         items={tabItems}

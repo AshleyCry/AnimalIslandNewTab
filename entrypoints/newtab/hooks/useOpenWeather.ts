@@ -4,6 +4,7 @@ import { useNewtabStore } from "../store";
 const OPEN_METEO_API_URL = "https://api.open-meteo.com/v1/forecast";
 const OPEN_METEO_AIR_QUALITY_API_URL =
   "https://air-quality-api.open-meteo.com/v1/air-quality";
+const WEATHER_CACHE_TTL_MS = 5 * 60 * 1000;
 
 type OpenMeteoResponse = {
   current?: {
@@ -107,6 +108,9 @@ export type OpenWeatherData = {
   dailyForecast: DailyWeatherForecast[];
   hourlyForecast: HourlyWeatherForecast[];
   location: string;
+  latitude: number;
+  longitude: number;
+  updatedAt: string;
 };
 
 type UseOpenWeatherState = {
@@ -121,7 +125,12 @@ type WeatherCoordinates = {
   locationName?: string;
 };
 
-const cachedWeatherByLocation = new Map<string, OpenWeatherData>();
+type CachedWeather = {
+  data: OpenWeatherData;
+  cachedAt: number;
+};
+
+const cachedWeatherByLocation = new Map<string, CachedWeather>();
 const weatherPromiseByLocation = new Map<string, Promise<OpenWeatherData>>();
 
 function getCurrentPosition() {
@@ -132,9 +141,9 @@ function getCurrentPosition() {
     }
 
     navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: false,
+      enableHighAccuracy: true,
       maximumAge: 10 * 60 * 1000,
-      timeout: 10 * 1000,
+      timeout: 15 * 1000,
     });
   });
 }
@@ -233,11 +242,13 @@ function normalizeAirQuality(
 function normalizeWeather(
   response: OpenMeteoResponse,
   airQualityResponse: OpenMeteoAirQualityResponse | null,
-  locationName?: string,
+  coordinates: WeatherCoordinates,
 ): OpenWeatherData {
   const weatherInfo = getWeatherInfo(response.current?.weather_code);
   const dailyForecast = (response.daily?.time ?? []).map((date, index) => {
-    const dailyWeatherInfo = getWeatherInfo(response.daily?.weather_code?.[index]);
+    const dailyWeatherInfo = getWeatherInfo(
+      response.daily?.weather_code?.[index],
+    );
 
     return {
       date,
@@ -245,7 +256,9 @@ function normalizeWeather(
       weatherType: dailyWeatherInfo.weatherType,
       lowTemperature: roundNumber(response.daily?.temperature_2m_min?.[index]),
       highTemperature: roundNumber(response.daily?.temperature_2m_max?.[index]),
-      precipitationSum: roundOneDecimal(response.daily?.precipitation_sum?.[index]),
+      precipitationSum: roundOneDecimal(
+        response.daily?.precipitation_sum?.[index],
+      ),
       precipitationProbability: roundNumber(
         response.daily?.precipitation_probability_max?.[index],
       ),
@@ -296,7 +309,10 @@ function normalizeWeather(
     airQuality: normalizeAirQuality(airQualityResponse),
     dailyForecast,
     hourlyForecast,
-    location: locationName || "",
+    location: coordinates.locationName || "当前位置",
+    latitude: coordinates.latitude,
+    longitude: coordinates.longitude,
+    updatedAt: new Date().toISOString(),
   };
 }
 
@@ -348,7 +364,11 @@ async function fetchOpenWeather({
   return normalizeWeather(
     (await response.json()) as OpenMeteoResponse,
     airQualityData,
-    locationName,
+    {
+      latitude,
+      longitude,
+      locationName,
+    },
   );
 }
 
@@ -365,7 +385,11 @@ function loadOpenWeather(coordinates: WeatherCoordinates) {
   const cachedWeather = cachedWeatherByLocation.get(cacheKey);
 
   if (cachedWeather) {
-    return Promise.resolve(cachedWeather);
+    if (Date.now() - cachedWeather.cachedAt < WEATHER_CACHE_TTL_MS) {
+      return Promise.resolve(cachedWeather.data);
+    }
+
+    cachedWeatherByLocation.delete(cacheKey);
   }
 
   const cachedPromise = weatherPromiseByLocation.get(cacheKey);
@@ -376,7 +400,10 @@ function loadOpenWeather(coordinates: WeatherCoordinates) {
 
   const weatherPromise = fetchOpenWeather(coordinates)
     .then((weather) => {
-      cachedWeatherByLocation.set(cacheKey, weather);
+      cachedWeatherByLocation.set(cacheKey, {
+        data: weather,
+        cachedAt: Date.now(),
+      });
       return weather;
     })
     .catch((error: unknown) => {

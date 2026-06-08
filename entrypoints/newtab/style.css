@@ -37,3 +37,31 @@ body,
     transform: translateX(0) scale(1);
   }
 }
+
+.weather-detail-scrollbar {
+  scrollbar-color: rgba(114, 93, 66, 0.28) transparent;
+  scrollbar-width: thin;
+}
+
+.weather-detail-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.weather-detail-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.weather-detail-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(114, 93, 66, 0.22);
+  border-radius: 999px;
+}
+
+.weather-detail-scrollbar:hover::-webkit-scrollbar-thumb,
+.weather-detail-scrollbar:active::-webkit-scrollbar-thumb {
+  background-color: rgba(114, 93, 66, 0.38);
+}
+
+.weather-detail-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}

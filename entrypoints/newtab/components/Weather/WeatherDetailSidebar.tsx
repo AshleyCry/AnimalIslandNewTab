@@ -8,7 +8,7 @@ import {
   ChevronUp,
   Clock3,
   Gauge,
-  Leaf,
+  MapPin,
   Sun,
   Sunrise,
   Sunset,
@@ -16,8 +16,10 @@ import {
   Umbrella,
   Waves,
   Wind,
+  Droplet,
 } from "lucide-react";
 import type { OpenWeatherData } from "../../hooks/useOpenWeather";
+import { useNewtabStore, type WeatherLocationMode } from "../../store";
 import Sidebar from "../Sidebar";
 import { getWeatherIcon, getWeatherIconColor } from "./weatherIcons";
 
@@ -37,6 +39,7 @@ type DetailMetricProps = {
   icon: ReactNode;
   hint?: string;
   accentClassName?: string;
+  accentTextClassName?: string;
 };
 
 function formatClockTime(value?: string) {
@@ -61,6 +64,12 @@ function formatHour(value: string) {
   return date.isValid() ? date.format("HH:mm") : value;
 }
 
+function formatUpdatedAt(value: string) {
+  const date = dayjs(value);
+
+  return date.isValid() ? date.format("YYYY-MM-DD HH:mm") : "--";
+}
+
 function getWindDirectionText(degree: number) {
   const directions = [
     "北风",
@@ -83,26 +92,31 @@ function DetailMetric({
   icon,
   hint,
   accentClassName = "bg-[#59C19D]",
+  accentTextClassName = "text-[#59C19D]",
 }: DetailMetricProps) {
   return (
-    <div className="relative min-w-0 overflow-hidden rounded-lg border-2 border-[#eadfcb] bg-[#fffaf0] p-3 shadow-[0_4px_0_rgba(216,192,149,0.8),0_8px_14px_rgba(114,93,66,0.1)]">
+    <div className="relative min-w-0 overflow-hidden rounded-lg border-2 border-[#eadfcb] border-b-0 bg-[#fffaf0] p-3 shadow-[0_4px_0_rgba(216,192,149,0.8)]">
       <span
         className={`absolute left-0 top-0 h-1.5 w-full ${accentClassName}`}
       />
-      <div className="mb-2 flex items-center gap-2 text-xs font-black text-[#9a8a76]">
+      <div className="grid grid-cols-[1fr_3rem] items-center gap-3 pt-1">
+        <div className="min-w-0 flex flex-col gap-1">
+          <div className={`truncate text-sm font-black ${accentTextClassName}`}>
+            {label}
+          </div>
+          <div className="wrap-break-word text-2xl font-black text-[#5f432d]">
+            {value}
+          </div>
+          {hint ? (
+            <div className="text-xs font-bold text-[#9a8a76]">{hint}</div>
+          ) : null}
+        </div>
         <span
-          className={`flex h-7 w-7 items-center justify-center rounded-full ${accentClassName} text-white`}
+          className={`flex h-12 w-12 items-center justify-center rounded-full ${accentClassName} text-white shadow-[0_3px_0_rgba(114,93,66,0.16)] [&>svg]:h-6 [&>svg]:w-6`}
         >
           {icon}
         </span>
-        <span>{label}</span>
       </div>
-      <div className="break-words text-xl font-black text-[#5f432d]">
-        {value}
-      </div>
-      {hint ? (
-        <div className="mt-1 text-xs font-bold text-[#9a8a76]">{hint}</div>
-      ) : null}
     </div>
   );
 }
@@ -159,6 +173,9 @@ function WeatherDetailContent({
   error,
 }: Pick<WeatherDetailSidebarProps, "data" | "isLoading" | "error">) {
   const [isDailyForecastExpanded, setIsDailyForecastExpanded] = useState(false);
+  const weatherLocationMode = useNewtabStore(
+    (state) => state.config.weatherLocationMode,
+  );
 
   if (isLoading) {
     return (
@@ -186,8 +203,8 @@ function WeatherDetailContent({
     : ChevronDown;
 
   return (
-    <div className="min-h-0 overflow-y-auto pr-1 text-[#725d42]">
-      <section className="relative mb-4 overflow-hidden rounded-lg border-2 border-[#ead7aa] bg-[#fffaf0] p-4 shadow-[0_4px_0_rgba(216,192,149,0.9),0_12px_20px_rgba(114,93,66,0.12)]">
+    <div className="weather-detail-scrollbar min-h-0 overflow-y-auto pr-1 text-[#725d42]">
+      <section className="relative mb-4 overflow-hidden rounded-lg border-2 border-[#ead7aa] bg-[#fffaf0] border-b-0 p-4 shadow-[0_4px_0_rgba(216,192,149,0.9)]">
         <div
           className="pointer-events-none absolute inset-0 opacity-45"
           style={{
@@ -207,7 +224,7 @@ function WeatherDetailContent({
             </div>
             <div className="min-w-0">
               <div className="mb-1 flex w-fit max-w-full items-center gap-1 rounded-full bg-[#59C19D] px-2.5 py-1 text-xs font-black text-white">
-                <Leaf className="h-3.5 w-3.5" />
+                <MapPin className="h-3.5 w-3.5" />
                 <span className="truncate">{data.location || "当前位置"}</span>
               </div>
               <div className="text-5xl font-black leading-none text-[#5f432d]">
@@ -215,26 +232,40 @@ function WeatherDetailContent({
               </div>
             </div>
           </div>
-          <div className="shrink-0 rounded-lg border-2 border-[#eadfcb] bg-[#fdf8e4] px-3 py-2 text-right shadow-[0_3px_0_rgba(216,192,149,0.8)]">
+          <div className="shrink-0 rounded-lg border-2 border-[#eadfcb] bg-[#fdf8e4] border-b-0 px-3 py-2 text-right shadow-[0_3px_0_rgba(216,192,149,0.8)]">
             <div className="text-lg font-black">{data.condition}</div>
             <div className="mt-1 text-sm font-bold text-[#8a7966]">
               最高 {data.highTemperature}℃ / 最低 {data.lowTemperature}℃
             </div>
           </div>
         </div>
+        <div className="relative mt-4 grid gap-2 rounded-lg border-2 border-[#eadfcb] bg-[#fdf8e4]/90 px-3 py-2 text-xs font-black text-[#8a7966] shadow-[0_2px_0_rgba(216,192,149,0.75)] sm:grid-cols-2">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <Clock3 className="h-3.5 w-3.5 shrink-0 text-[#59C19D]" />
+            <span className="min-w-0 truncate">
+              {formatUpdatedAt(data.updatedAt)}
+            </span>
+          </div>
+          <div className="flex min-w-0 items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#59C19D]" />
+            <span className="min-w-0 truncate">
+              {data.latitude.toFixed(4)}, {data.longitude.toFixed(4)}
+            </span>
+          </div>
+        </div>
       </section>
 
-      <section className="mb-4 rounded-lg border-2 border-[#eadfcb] bg-[#fdf8e4] p-4 shadow-[0_4px_0_rgba(216,192,149,0.85),0_9px_16px_rgba(114,93,66,0.1)]">
+      <section className="mb-4 rounded-lg border-2 border-[#eadfcb] bg-[#fdf8e4] border-b-0 p-4 shadow-[0_4px_0_rgba(216,192,149,0.8)]">
         <SectionHeader
           icon={<Clock3 className="h-4 w-4" />}
           title="未来24小时天气"
           note="温度 / 降水"
         />
-        <div className="flex gap-3 overflow-x-auto pb-1">
+        <div className="weather-detail-scrollbar flex gap-3 overflow-x-auto pb-1">
           {data.hourlyForecast.map((item) => (
             <div
               key={item.time}
-              className="w-20 shrink-0 rounded-lg border-2 border-[#eadfcb] bg-[#fffaf0] p-2 text-center shadow-[0_3px_0_rgba(216,192,149,0.75)]"
+              className="w-20 shrink-0 rounded-lg border-2 border-[#eadfcb] bg-[#fffaf0] p-2 text-center"
             >
               <div className="rounded-full bg-[#bfe7dd] px-2 py-0.5 text-xs font-black text-[#5f432d]">
                 {formatHour(item.time)}
@@ -249,15 +280,19 @@ function WeatherDetailContent({
               <div className="mt-1 truncate text-xs font-bold">
                 {item.condition}
               </div>
-              <div className="mt-1 rounded-full bg-[#d8ecf2] px-1.5 py-0.5 text-xs font-black text-[#3f8edc]">
-                {item.precipitationProbability}%
+              <div className="mt-1 rounded-full bg-[#d8ecf2] px-1.5 py-0.5 text-xs font-black text-[#3f8edc] flex items-center justify-center gap-1">
+                <Droplet
+                  className="h-2.5 w-2.5 text-[#3f8edc]"
+                  fill="currentColor"
+                />
+                <span>{item.precipitationProbability}%</span>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mb-4 rounded-lg border-2 border-[#eadfcb] bg-[#fdf8e4] p-4 shadow-[0_4px_0_rgba(216,192,149,0.85),0_9px_16px_rgba(114,93,66,0.1)]">
+      <section className="mb-4 rounded-lg border-2 border-[#eadfcb] bg-[#fdf8e4] border-b-0 p-4 shadow-[0_4px_0_rgba(216,192,149,0.8)]">
         <SectionHeader
           icon={<CalendarDays className="h-4 w-4" />}
           title="近15日天气"
@@ -304,13 +339,16 @@ function WeatherDetailContent({
         <DetailMetric
           label="空气质量"
           value={
-            data.airQuality.aqi === null ? "--" : String(data.airQuality.aqi)
+            data.airQuality.aqi === null
+              ? "--"
+              : `${data.airQuality.aqi} ${data.airQuality.level}`
           }
           icon={<Waves className="h-4 w-4" />}
-          hint={`${data.airQuality.level} PM2.5 ${
+          hint={`PM2.5 ${
             data.airQuality.pm25 ?? "--"
           } / PM10 ${data.airQuality.pm10 ?? "--"}`}
           accentClassName="bg-[#59C19D]"
+          accentTextClassName="text-[#3b9f7f]"
         />
         <DetailMetric
           label="紫外线"
@@ -318,6 +356,7 @@ function WeatherDetailContent({
           icon={<Sun className="h-4 w-4" />}
           hint={data.uvIndex >= 6 ? "注意防晒" : "强度较低"}
           accentClassName="bg-[#ffc53d]"
+          accentTextClassName="text-[#c48700]"
         />
         <DetailMetric
           label="湿度"
@@ -325,6 +364,7 @@ function WeatherDetailContent({
           icon={<Umbrella className="h-4 w-4" />}
           hint="当前相对湿度"
           accentClassName="bg-[#42a5f5]"
+          accentTextClassName="text-[#2f8bc6]"
         />
         <DetailMetric
           label="体感温度"
@@ -332,13 +372,15 @@ function WeatherDetailContent({
           icon={<Thermometer className="h-4 w-4" />}
           hint="结合湿度与风感"
           accentClassName="bg-[#f28b66]"
+          accentTextClassName="text-[#cf6744]"
         />
         <DetailMetric
           label="风力信息"
           value={`${data.windSpeed} km/h`}
           icon={<Wind className="h-4 w-4" />}
-          hint={`${getWindDirectionText(data.windDirection)} 阵风 ${data.windGusts} km/h`}
+          hint={`${getWindDirectionText(data.windDirection)} 阵风 ${data.windGusts}km/h`}
           accentClassName="bg-[#7bcf92]"
+          accentTextClassName="text-[#4b9f63]"
         />
         <DetailMetric
           label="气压"
@@ -346,6 +388,7 @@ function WeatherDetailContent({
           icon={<Gauge className="h-4 w-4" />}
           hint="海平面气压"
           accentClassName="bg-[#9c8ee8]"
+          accentTextClassName="text-[#7467d8]"
         />
       </section>
 
@@ -355,12 +398,14 @@ function WeatherDetailContent({
           value={formatClockTime(data.sunrise)}
           icon={<Sunrise className="h-4 w-4" />}
           accentClassName="bg-[#f28b66]"
+          accentTextClassName="text-[#cf6744]"
         />
         <DetailMetric
           label="日落"
           value={formatClockTime(data.sunset)}
           icon={<Sunset className="h-4 w-4" />}
           accentClassName="bg-[#7467d8]"
+          accentTextClassName="text-[#7467d8]"
         />
       </section>
     </div>
