@@ -13,7 +13,7 @@ export default defineConfig({
     description: "A cozy Animal Island-inspired new tab page.",
     version: "1.0.5",
     manifest_version: 3,
-    permissions: ["geolocation"],
+    permissions: ["geolocation", "search"],
     host_permissions: [
       "https://api.open-meteo.com/*",
       "https://air-quality-api.open-meteo.com/*",

@@ -1,7 +1,7 @@
 import { create } from "zustand";
+import { canUseBrowserDefaultSearch } from "./utils/browserSearch";
 
 export type ClockFormat = "12h" | "24h";
-type WeatherTemperatureDisplay = "current" | "range";
 export type WeatherLocationMode = "auto" | "manual";
 export type BackgroundType = "color" | "image";
 
@@ -17,7 +17,12 @@ type ManualWeatherLocation = {
   longitude: number;
 };
 
-export type SearchEngine = "google" | "bing" | "duckduckgo" | "baidu";
+export type SearchEngine =
+  | "google"
+  | "bing"
+  | "duckduckgo"
+  | "baidu"
+  | "default";
 
 export type NewtabConfig = {
   backgroundType: BackgroundType;
@@ -51,6 +56,13 @@ type NewtabStore = {
 };
 
 const CONFIG_STORAGE_KEY = "animal-cross-newtab-config";
+const SEARCH_ENGINES: SearchEngine[] = [
+  "google",
+  "bing",
+  "duckduckgo",
+  "baidu",
+  "default",
+];
 
 const DEFAULT_CONFIG: NewtabConfig = {
   backgroundType: "color",
@@ -67,7 +79,7 @@ const DEFAULT_CONFIG: NewtabConfig = {
     longitude: 121.4737,
   },
   enableSearch: true,
-  searchEngine: "google",
+  searchEngine: canUseBrowserDefaultSearch() ? "default" : "google",
   enableSearchSuggestions: true,
   enableDailyQuote: false,
   customDailyQuote: false,
@@ -148,10 +160,23 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function normalizeSearchEngine(value: unknown): SearchEngine {
+  if (!SEARCH_ENGINES.includes(value as SearchEngine)) {
+    return DEFAULT_CONFIG.searchEngine;
+  }
+
+  if (value === "default" && !canUseBrowserDefaultSearch()) {
+    return "google";
+  }
+
+  return value as SearchEngine;
+}
+
 function mergeConfig(config: Partial<NewtabConfig>): NewtabConfig {
   return {
     ...DEFAULT_CONFIG,
     ...config,
+    searchEngine: normalizeSearchEngine(config.searchEngine),
     manualWeatherLocation: {
       ...DEFAULT_CONFIG.manualWeatherLocation,
       ...(isRecord(config.manualWeatherLocation)

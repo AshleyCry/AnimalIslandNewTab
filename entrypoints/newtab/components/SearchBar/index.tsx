@@ -2,33 +2,44 @@ import { useState } from "react";
 import { Select } from "animal-island-ui";
 import { Search } from "lucide-react";
 import { useNewtabStore, type SearchEngine } from "../../store";
+import {
+  canUseBrowserDefaultSearch,
+  getBrowserDefaultSearchApi,
+} from "../../utils/browserSearch";
 import "./style.css";
 
-const ENGINES = [
+const BROWSER_DEFAULT_ENGINE = {
+  id: "default",
+  name: "浏览器默认",
+} as const;
+
+const URL_ENGINES = [
   {
-    id: "google",
+    id: "google" as const,
     name: "Google",
     url: "https://www.google.com/search?q=",
   },
   {
-    id: "bing",
+    id: "bing" as const,
     name: "Bing",
     url: "https://www.bing.com/search?q=",
   },
   {
-    id: "baidu",
+    id: "baidu" as const,
     name: "百度",
     url: "https://www.baidu.com/s?wd=",
   },
   {
-    id: "duckduckgo",
+    id: "duckduckgo" as const,
     name: "DuckDuckGo",
     url: "https://duckduckgo.com/?q=",
   },
 ];
 
-function isSearchEngine(value: string): value is SearchEngine {
-  return ENGINES.some((engine) => engine.id === value);
+function getEngines() {
+  return canUseBrowserDefaultSearch()
+    ? [BROWSER_DEFAULT_ENGINE, ...URL_ENGINES]
+    : URL_ENGINES;
 }
 
 export function SearchBar() {
@@ -36,25 +47,40 @@ export function SearchBar() {
   const engineId = useNewtabStore((state) => state.config.searchEngine);
   const updateConfig = useNewtabStore((state) => state.updateConfig);
 
-  const engine = ENGINES.find((item) => item.id === engineId) ?? ENGINES[0];
-  const engineOptions = ENGINES.map((item) => ({
+  const engines = getEngines();
+  const engineOptions = engines.map((item) => ({
     key: item.id,
     label: item.name,
   }));
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      window.location.href = engine.url + encodeURIComponent(query);
-    }
-  };
+    const searchText = query.trim();
 
-  const handleEngineChange = (value: string) => {
-    if (!isSearchEngine(value)) {
+    if (!searchText) {
       return;
     }
 
-    updateConfig({ searchEngine: value });
+    if (engineId === "default") {
+      void getBrowserDefaultSearchApi()?.query?.({
+        text: searchText,
+        disposition: "CURRENT_TAB",
+      });
+      return;
+    }
+
+    const engine =
+      URL_ENGINES.find((item) => item.id === engineId) ?? URL_ENGINES[0];
+
+    window.location.href = engine.url + encodeURIComponent(searchText);
+  };
+
+  const handleEngineChange = (value: string) => {
+    if (!engines.some((engine) => engine.id === value)) {
+      return;
+    }
+
+    updateConfig({ searchEngine: value as SearchEngine });
   };
 
   return (
